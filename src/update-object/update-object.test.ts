@@ -109,3 +109,105 @@ test("change object with optional keys", () => {
     }
   `);
 });
+
+test("Safety mode on", () => {
+  expect(
+    (() => {
+      interface Foo {
+        age: number;
+        name: string;
+        info:
+          | {
+              token: string;
+              date: string;
+            }
+          | {};
+      }
+
+      const foo: Foo = {
+        age: 1,
+        name: "S",
+        info: {
+          token: "token",
+          date: "123",
+        },
+      };
+
+      return updateObject(foo, { info: {} });
+    })()
+  ).toStrictEqual({
+    age: 1,
+    name: "S",
+    info: {
+      token: "token",
+      date: "123",
+    },
+  });
+});
+
+test("Safety mode off: change property", () => {
+  expect(
+    (() => {
+      interface Foo {
+        age: number;
+        name: string;
+        info:
+          | {
+              token: string;
+              date: string;
+            }
+          | {};
+      }
+
+      const foo: Foo = {
+        age: 1,
+        name: "S",
+        info: {
+          token: "some_token",
+          date: "123",
+        },
+      };
+
+      return updateObject(foo, { info: { token: "!" } }, { safetyMode: false });
+    })()
+  ).toStrictEqual({
+    age: 1,
+    name: "S",
+    info: {
+      token: "!",
+      date: "123",
+    },
+  });
+});
+
+test("Safety mode off: rewrite", () => {
+  expect(
+    (() => {
+      interface Foo {
+        age: number;
+        name: string;
+        info:
+          | {
+              token: string;
+              date: string;
+            }
+          | {};
+      }
+
+      const foo: Foo = {
+        age: 1,
+        name: "S",
+        info: {
+          token: "some_token",
+          date: "123",
+        },
+      };
+
+      return updateObject(foo, { info: {} }, { safetyMode: false });
+    })()
+  ).toStrictEqual({
+    age: 1,
+    name: "S",
+    info: {},
+  });
+});

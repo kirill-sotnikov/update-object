@@ -40,3 +40,49 @@ const newPerson = updateObject(person, { parent: { father: { age: 36 } } });
 //   ban: () => {},
 // }
 ```
+
+По-умолчанию updateObject защищает вас от следующего действия:
+
+```ts
+interface Foo {
+  age: number;
+  name: string;
+  info:
+    | {
+        token: string;
+        date: string;
+      }
+    | {};
+}
+
+const foo: Foo = {
+  age: 1,
+  name: "S",
+  info: {
+    token: "token",
+    date: "123",
+  },
+};
+
+updateObject(foo, { info: {} });
+// объект foo останется прежним
+// {
+//   age: 1,
+//   name: "S",
+//   info: {
+//     token: "token",
+//     date: "123",
+//   },
+// }
+```
+
+Если вы действительно хотите сделать данное действие, тогда вам нужно отключить `safetyMode`
+
+```ts
+updateObject(foo, { info: {} }, { safetyMode: false });
+// {
+//   age: 1,
+//   name: "S",
+//   info: {},
+// }
+```
